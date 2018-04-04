@@ -139,10 +139,8 @@ void main(){
                 }
                 k--;
                 quicksort(queue1,0,last_pointer1,1);
-                printf("Check 1 %d\n",time);
                 if(queue1[0].priority<cpu_burst[i].priority){
                     if(cpu_burst[i].burst!=0&&cpu_burst[i].time_quantum!=0){
-                        printf("Check 2 %d\n",time);
                         proc_in_cpu=search(process_list, cpu_burst[i].proc_id,total_processes);
                         struct process process_eliminated;
                         queue1=del_queue(queue1,&last_pointer1, &process_eliminated);
@@ -162,7 +160,6 @@ void main(){
                         k++;
                     }
                     else{
-                        printf("Check 1.5 %d\n",time);
                         cpu_burst=realloc(cpu_burst,sizeof(struct cpu)*(i+2));
                         i++;
                         struct process process_eliminated;
@@ -182,7 +179,6 @@ void main(){
                 }
                 else{
                     if(cpu_burst[i].burst!=0&&cpu_burst[i].time_quantum!=0){
-                        printf("Check 12 %d\n",time);
                         cpu_burst[i].execTime++;
                         cpu_burst[i].burst--;
                         proc_in_cpu=search(process_list, cpu_burst[i].proc_id,total_processes);
@@ -191,13 +187,11 @@ void main(){
                         k++;
                     }
                     else{
-                        printf("Check 133 %d\n",time);
                         cpu_burst=realloc(cpu_burst,sizeof(struct cpu)*(i+2));
                         i++;
                         struct process process_eliminated;
                         queue1=del_queue(queue1,&last_pointer1, &process_eliminated);
                         strcpy(cpu_burst[i].proc_id,process_eliminated.id);
-                        printf("%s\n",cpu_burst[i].proc_id);
                         cpu_burst[i].execTime=0;
                         cpu_burst[i].priority=process_eliminated.priority;
                         cpu_burst[i].burst=process_eliminated.burst;
@@ -212,9 +206,7 @@ void main(){
                 }
             }
             else{
-                printf("Check 3 %d\n",time);
                 if(cpu_burst[i].burst!=0&&cpu_burst[i].time_quantum!=0){
-                    printf("Check 4 %d\n",time);
                     cpu_burst[i].execTime++;
                     cpu_burst[i].burst--;
                     proc_in_cpu=search(process_list, cpu_burst[i].proc_id,total_processes);
@@ -223,7 +215,6 @@ void main(){
                 }
                 else{
                     if(strcmp(cpu_burst[i].proc_id,"Idle")!=0&&(last_pointer1==-1)&&(last_pointer2==-1)){
-                        printf("Check 41 %d\n",time);
                         cpu_burst=realloc(cpu_burst,sizeof(struct cpu)*(i+2));
                         i++;
                         strcpy(cpu_burst[i].proc_id,"Idle");
@@ -237,7 +228,6 @@ void main(){
                             cpu_burst[i].execTime++;
                         else{
                             if((last_pointer1!=-1)){
-                                printf("Check 43 %d\n",time);
                                 if(cpu_burst[i].burst!=0){
                                     proc_in_cpu=search(process_list, cpu_burst[i].proc_id,total_processes);
                                     queue2=add_queue(queue2, &last_pointer2,process_list[proc_in_cpu]);
@@ -259,7 +249,6 @@ void main(){
                             }
                             else{
                                 if(last_pointer2!=-1){
-                                    printf("Check 7 %d\n",time);
                                     struct process process_eliminated;
                                     queue2=del_queue(queue2,&last_pointer2, &process_eliminated);
                                     cpu_burst=realloc(cpu_burst,sizeof(struct cpu)*(i+2));
@@ -289,7 +278,6 @@ void main(){
         }
         else{
             if((cpu_burst[i].burst!=0)&&(cpu_burst[i].time_quantum!=0)){
-                printf("Check 5 %d\n",time);
                 cpu_burst[i].execTime++;
                 cpu_burst[i].burst--;
                 proc_in_cpu=search(process_list, cpu_burst[i].proc_id,total_processes);
@@ -298,7 +286,6 @@ void main(){
             }
             else{
                 if(last_pointer1!=-1){
-                    printf("Check 6 %d\n",time);
                     if(cpu_burst[i].burst!=0){
                         proc_in_cpu=search(process_list, cpu_burst[i].proc_id,total_processes);
                         queue2=add_queue(queue2, &last_pointer2,process_list[proc_in_cpu]);
@@ -320,7 +307,10 @@ void main(){
                 }
                 else{
                     if(last_pointer2!=-1){
-                        printf("Check 7 %d\n",time);
+                        if(cpu_burst[i].burst!=0){
+                            proc_in_cpu=search(process_list, cpu_burst[i].proc_id,total_processes);
+                            queue2=add_queue(queue2, &last_pointer2,process_list[proc_in_cpu]);
+                        }
                         struct process process_eliminated;
                         queue2=del_queue(queue2,&last_pointer2, &process_eliminated);
                         cpu_burst=realloc(cpu_burst,sizeof(struct cpu)*(i+2));
@@ -330,6 +320,7 @@ void main(){
                         cpu_burst[i].priority=process_eliminated.priority;
                         cpu_burst[i].burst=process_eliminated.burst;
                         cpu_burst[i].time_quantum=2;
+                        proc_in_cpu=search(process_list, cpu_burst[i].proc_id,total_processes);
                         cpu_burst[i].execTime++;
                         cpu_burst[i].burst--;
                         proc_in_cpu=search(process_list, cpu_burst[i].proc_id,total_processes);
@@ -346,8 +337,12 @@ void main(){
             }
         }
     }
-    for(int k=0;k<=i;k++){
-        printf("CPU:%s\t%d\n",cpu_burst[k].proc_id,cpu_burst[k].execTime);
+    printf("\nCPU Utilization:\n");
+	for(int k=0;k<=i;k++){
+        if(strcmp(cpu_burst[k].proc_id,"Idle")!=0)
+            printf("CPU:%s\t  %d\n",cpu_burst[k].proc_id,cpu_burst[k].execTime);
+        else
+            printf("CPU:%s  %d\n",cpu_burst[k].proc_id,cpu_burst[k].execTime);
 	}
     for(i=0;i<=last_pointer1;i++){
         printf("QUEUE1:%s\n",queue1[i].id);
