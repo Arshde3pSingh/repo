@@ -8,7 +8,8 @@ struct cpu{
 };
 struct process{
     char id[10];
-	int priority,burst,arrival;
+	int priority, burst, arrival;
+    int wait_time;
 };
 struct process *add_queue(struct process *queue, int *last_pointer, struct process proc){
 	if(*last_pointer==-1){
@@ -100,6 +101,7 @@ void main(){
 		scanf("%d",&process_list[i].burst);
 		printf("Arrival Time: ");
 		scanf("%d",&process_list[i].arrival);
+        process_list[i].wait_time=0;
 		i++;
 	}
     printf("Details Entered:");	
@@ -111,14 +113,15 @@ void main(){
 		printf("%d\n",process_list[i].arrival);
 	}
 	quicksort(process_list,0,total_processes-1, 0);
-    printf("Details Entered (Sorted according to Arrival Time):");	
-	printf("\nProcess\tPrior\tBurst\tArrival\n\t-ty\tTime\tTime\n");
+    int loc=0;
 	for(i=0;i<total_processes;i++){
-		printf("%s\t",process_list[i].id);
-		printf("%d\t ",process_list[i].priority);
-		printf("%d\t",process_list[i].burst);
-		printf("%d\n",process_list[i].arrival);
+        if((i>0)&&(process_list[0].arrival==process_list[i].arrival)&&(process_list[i].priority<process_list[0].priority)){
+            loc=i;
+        }
 	}
+	struct process temp1=process_list[loc];
+    process_list[loc]=process_list[0];
+    process_list[0]=temp1;
     struct cpu *cpu_burst=malloc(sizeof(struct cpu));
     strcpy(cpu_burst[0].proc_id,process_list[0].id);
     cpu_burst[0].execTime=0;
@@ -138,7 +141,8 @@ void main(){
                     }
                 }
                 k--;
-                quicksort(queue1,0,last_pointer1,1);
+                if(last_pointer1>0)
+                    quicksort(queue1,0,last_pointer1,1);
                 if(queue1[0].priority<cpu_burst[i].priority){
                     if(cpu_burst[i].burst>0&&cpu_burst[i].time_quantum>0){
                         proc_in_cpu=search(process_list, cpu_burst[i].proc_id,total_processes);
@@ -158,6 +162,14 @@ void main(){
                         process_list[proc_in_cpu].burst--;
                         cpu_burst[i].time_quantum--;
                         k++;
+                        for(int w1=0; w1<=last_pointer1; w1++){
+                            proc_in_cpu=search(process_list, queue1[w1].id,total_processes);
+                            process_list[proc_in_cpu].wait_time++;
+                        }
+                        for(int w1=0; w1<=last_pointer2; w1++){
+                            proc_in_cpu=search(process_list, queue2[w1].id,total_processes);
+                            process_list[proc_in_cpu].wait_time++;
+                        }
                     }
                     else{
                         cpu_burst=realloc(cpu_burst,sizeof(struct cpu)*(i+2));
@@ -175,6 +187,14 @@ void main(){
                         process_list[proc_in_cpu].burst--;
                         cpu_burst[i].time_quantum--;
                         k++;
+                        for(int w1=0; w1<=last_pointer1; w1++){
+                            proc_in_cpu=search(process_list, queue1[w1].id,total_processes);
+                            process_list[proc_in_cpu].wait_time++;
+                        }
+                        for(int w1=0; w1<=last_pointer2; w1++){
+                            proc_in_cpu=search(process_list, queue2[w1].id,total_processes);
+                            process_list[proc_in_cpu].wait_time++;
+                        }
                     }
                 }
                 else{
@@ -185,6 +205,14 @@ void main(){
                         process_list[proc_in_cpu].burst--;
                         cpu_burst[i].time_quantum--;
                         k++;
+                        for(int w1=0; w1<=last_pointer1; w1++){
+                            proc_in_cpu=search(process_list, queue1[w1].id,total_processes);
+                            process_list[proc_in_cpu].wait_time++;
+                        }
+                        for(int w1=0; w1<=last_pointer2; w1++){
+                            proc_in_cpu=search(process_list, queue2[w1].id,total_processes);
+                            process_list[proc_in_cpu].wait_time++;
+                        }
                     }
                     else{
                         cpu_burst=realloc(cpu_burst,sizeof(struct cpu)*(i+2));
@@ -202,6 +230,14 @@ void main(){
                         process_list[proc_in_cpu].burst--;
                         cpu_burst[i].time_quantum--;
                         k++;
+                        for(int w1=0; w1<=last_pointer1; w1++){
+                            proc_in_cpu=search(process_list, queue1[w1].id,total_processes);
+                            process_list[proc_in_cpu].wait_time++;
+                        }
+                        for(int w1=0; w1<=last_pointer2; w1++){
+                            proc_in_cpu=search(process_list, queue2[w1].id,total_processes);
+                            process_list[proc_in_cpu].wait_time++;
+                        }
                     }
                 }
             }
@@ -212,6 +248,14 @@ void main(){
                     proc_in_cpu=search(process_list, cpu_burst[i].proc_id,total_processes);
                     process_list[proc_in_cpu].burst--;
                     cpu_burst[i].time_quantum--;
+                    for(int w1=0; w1<=last_pointer1; w1++){
+                        proc_in_cpu=search(process_list, queue1[w1].id,total_processes);
+                        process_list[proc_in_cpu].wait_time++;
+                    }
+                    for(int w1=0; w1<=last_pointer2; w1++){
+                        proc_in_cpu=search(process_list, queue2[w1].id,total_processes);
+                        process_list[proc_in_cpu].wait_time++;
+                    }
                 }
                 else{
                     if(strcmp(cpu_burst[i].proc_id,"Idle")!=0&&(last_pointer1==-1)&&(last_pointer2==-1)){
@@ -247,6 +291,14 @@ void main(){
                                 proc_in_cpu=search(process_list, cpu_burst[i].proc_id,total_processes);
                                 process_list[proc_in_cpu].burst--;
                                 cpu_burst[i].time_quantum--;
+                                for(int w1=0; w1<=last_pointer1; w1++){
+                                    proc_in_cpu=search(process_list, queue1[w1].id,total_processes);
+                                    process_list[proc_in_cpu].wait_time++;
+                                }
+                                for(int w1=0; w1<=last_pointer2; w1++){
+                                    proc_in_cpu=search(process_list, queue2[w1].id,total_processes);
+                                    process_list[proc_in_cpu].wait_time++;
+                                }
                             }
                             else{
                                 if(last_pointer2!=-1){
@@ -273,6 +325,14 @@ void main(){
                                     proc_in_cpu=search(process_list, cpu_burst[i].proc_id,total_processes);
                                     process_list[proc_in_cpu].burst--;
                                     cpu_burst[i].time_quantum--;
+                                    for(int w1=0; w1<=last_pointer1; w1++){
+                                        proc_in_cpu=search(process_list, queue1[w1].id,total_processes);
+                                        process_list[proc_in_cpu].wait_time++;
+                                    }
+                                    for(int w1=0; w1<=last_pointer2; w1++){
+                                        proc_in_cpu=search(process_list, queue2[w1].id,total_processes);
+                                        process_list[proc_in_cpu].wait_time++;
+                                    }
                                 }
                                 else{
                                     if((cpu_burst[i].burst>0)&&(cpu_burst[i].time_quantum==0)){
@@ -294,6 +354,14 @@ void main(){
                 proc_in_cpu=search(process_list, cpu_burst[i].proc_id,total_processes);
                 process_list[proc_in_cpu].burst--;
                 cpu_burst[i].time_quantum--;
+                for(int w1=0; w1<=last_pointer1; w1++){
+                    proc_in_cpu=search(process_list, queue1[w1].id,total_processes);
+                    process_list[proc_in_cpu].wait_time++;
+                }
+                for(int w1=0; w1<=last_pointer2; w1++){
+                    proc_in_cpu=search(process_list, queue2[w1].id,total_processes);
+                    process_list[proc_in_cpu].wait_time++;
+                }
             }
             else{
                 if(last_pointer1!=-1){
@@ -316,6 +384,14 @@ void main(){
                     proc_in_cpu=search(process_list, cpu_burst[i].proc_id,total_processes);
                     process_list[proc_in_cpu].burst--;
                     cpu_burst[i].time_quantum--;
+                    for(int w1=0; w1<=last_pointer1; w1++){
+                        proc_in_cpu=search(process_list, queue1[w1].id,total_processes);
+                        process_list[proc_in_cpu].wait_time++;
+                    }
+                    for(int w1=0; w1<=last_pointer2; w1++){
+                        proc_in_cpu=search(process_list, queue2[w1].id,total_processes);
+                        process_list[proc_in_cpu].wait_time++;
+                    }
                 }
                 else{
                     if(last_pointer2!=-1){
@@ -326,7 +402,6 @@ void main(){
                         }
                         struct process process_eliminated;
                         queue2=del_queue(queue2,&last_pointer2, &process_eliminated);
-                        printf("%d\n",process_eliminated.burst);
                         cpu_burst=realloc(cpu_burst,sizeof(struct cpu)*(i+2));
                         i++;
                         strcpy(cpu_burst[i].proc_id,process_eliminated.id);
@@ -344,6 +419,14 @@ void main(){
                         proc_in_cpu=search(process_list, cpu_burst[i].proc_id,total_processes);
                         process_list[proc_in_cpu].burst--;
                         cpu_burst[i].time_quantum--;
+                        for(int w1=0; w1<=last_pointer1; w1++){
+                            proc_in_cpu=search(process_list, queue1[w1].id,total_processes);
+                            process_list[proc_in_cpu].wait_time++;
+                        }
+                        for(int w1=0; w1<=last_pointer2; w1++){
+                            proc_in_cpu=search(process_list, queue2[w1].id,total_processes);
+                            process_list[proc_in_cpu].wait_time++;
+                        }
                     }
                     else{
                         if((cpu_burst[i].burst>0)&&(cpu_burst[i].time_quantum==0)){
@@ -357,24 +440,20 @@ void main(){
         }
     }
     printf("\nCPU Utilization:\n");
-	for(int k=0;k<=i;k++){
-        if(strcmp(cpu_burst[k].proc_id,"Idle")!=0)
-            printf("CPU:%s\t  %d\n",cpu_burst[k].proc_id,cpu_burst[k].execTime);
-        else
-            printf("CPU:%s  %d\n",cpu_burst[k].proc_id,cpu_burst[k].execTime);
-	}
 	int sum=process_list[0].arrival;
     if(sum!=0)
         printf("Idle:\t from 0 to %d\n",sum); 
 	for(int k=0;k<=i;k++){
         int temp=sum;
         sum=sum+cpu_burst[k].execTime;
-        printf("%s:\t from %d to %d\n",cpu_burst[k].proc_id,temp,sum);
+        if(cpu_burst[k].execTime!=0)
+            printf("%s:\t from %d to %d\n",cpu_burst[k].proc_id,temp,sum);
     }
-    for(i=0;i<=last_pointer1;i++){
-        printf("QUEUE1:%s\n",queue1[i].id);
-	}
-	for(i=0;i<=last_pointer2;i++){
-        printf("QUEUE2:%s \n",queue2[i].id);
-	}
+    printf("\nWaiting Time:\n");
+    float average_wait=0;
+	for(int k=0; k<total_processes;k++){
+        printf("Waiting Time for %s: %d\n",process_list[k].id, process_list[k].wait_time);
+        average_wait=average_wait+process_list[k].wait_time;
+    }
+    printf("\nAverage waiting time: %f\nTurnaround Time: %f\n",(average_wait/total_processes),(average_wait/total_processes)+sum);
 }
